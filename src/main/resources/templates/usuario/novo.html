@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Novo Usuário</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f5f6f8;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            padding: 25px;
+            background-color: #ffffff;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 9px;
+            border: 1px solid #b8b8b8;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #2c3e50;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-top: 18px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-container input {
+            width: auto;
+            margin: 0 8px 0 0;
+        }
+
+        .checkbox-container label {
+            margin: 0;
+            font-weight: normal;
+        }
+
+        .acoes {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #2c3e50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1f2f3d;
+        }
+
+        .cancelar {
+            padding: 9px 18px;
+            border: 1px solid #777777;
+            border-radius: 4px;
+            color: #333333;
+            text-decoration: none;
+        }
+
+        .cancelar:hover {
+            background-color: #eeeeee;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Cadastro de Usuário</h2>
+
+    <form th:action="@{/usuarios/salvar}"
+          th:object="${usuario}"
+          method="post">
+
+        <label for="nome">Nome</label>
+
+        <input id="nome"
+               type="text"
+               th:field="*{nome}"
+               maxlength="100"
+               autocomplete="name"
+               required>
+
+        <label for="email">E-mail</label>
+
+        <input id="email"
+               type="email"
+               th:field="*{email}"
+               maxlength="100"
+               autocomplete="email"
+               required>
+
+        <label for="senha">Senha</label>
+
+        <input id="senha"
+               type="password"
+               th:field="*{senha}"
+               minlength="6"
+               autocomplete="new-password"
+               required>
+
+        <label for="perfil">Perfil</label>
+
+        <select id="perfil"
+                th:field="*{perfil}"
+                required>
+
+            <option value="">Selecione um perfil</option>
+            <option value="ADMIN">Administrador</option>
+            <option value="TECNICO">Técnico</option>
+
+        </select>
+
+        <div class="checkbox-container">
+
+            <input id="ativo"
+                   type="checkbox"
+                   th:field="*{ativo}">
+
+            <label for="ativo">Usuário ativo</label>
+
+        </div>
+
+        <div class="acoes">
+
+            <button type="submit">
+                Salvar
+            </button>
+
+            <a class="cancelar"
+               th:href="@{/usuarios}">
+                Cancelar
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+</body>
+</html>
