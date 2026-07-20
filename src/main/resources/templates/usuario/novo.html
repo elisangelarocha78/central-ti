@@ -4,35 +4,44 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Novo Usuário</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
+            margin: 0;
+            padding: 40px;
             font-family: Arial, sans-serif;
-            margin: 40px;
             background-color: #f5f6f8;
+            color: #222222;
         }
 
         .container {
             width: 100%;
-            max-width: 450px;
-            padding: 25px;
+            max-width: 460px;
+            margin: 0 auto;
+            padding: 28px;
             background-color: #ffffff;
             border: 1px solid #dcdcdc;
             border-radius: 8px;
-            box-sizing: border-box;
         }
 
         h2 {
             margin-top: 0;
+            margin-bottom: 24px;
             color: #2c3e50;
         }
 
         label {
             display: block;
-            margin-top: 12px;
+            margin-top: 14px;
             margin-bottom: 5px;
             font-weight: bold;
         }
@@ -42,10 +51,10 @@
         input[type="password"],
         select {
             width: 100%;
-            padding: 9px;
+            padding: 10px;
             border: 1px solid #b8b8b8;
             border-radius: 4px;
-            box-sizing: border-box;
+            font-size: 15px;
         }
 
         input[type="text"]:focus,
@@ -56,11 +65,32 @@
             border-color: #2c3e50;
         }
 
+        .campo-invalido {
+            border-color: #e74c3c !important;
+            background-color: #fff7f6;
+        }
+
+        .mensagem-erro {
+            display: block;
+            margin-top: 5px;
+            color: #d93025;
+            font-size: 14px;
+        }
+
+        .alerta-erro {
+            margin-bottom: 18px;
+            padding: 12px;
+            border: 1px solid #e8a39d;
+            border-radius: 4px;
+            background-color: #fff1f0;
+            color: #a93226;
+        }
+
         .checkbox-container {
             display: flex;
             align-items: center;
-            margin-top: 18px;
-            margin-bottom: 20px;
+            margin-top: 22px;
+            margin-bottom: 22px;
         }
 
         .checkbox-container input {
@@ -80,11 +110,12 @@
         }
 
         button {
-            padding: 10px 20px;
+            padding: 10px 22px;
             border: none;
             border-radius: 4px;
             background-color: #2c3e50;
-            color: white;
+            color: #ffffff;
+            font-size: 15px;
             cursor: pointer;
         }
 
@@ -103,6 +134,16 @@
         .cancelar:hover {
             background-color: #eeeeee;
         }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 20px;
+            }
+
+            .container {
+                padding: 22px;
+            }
+        }
     </style>
 </head>
 
@@ -112,48 +153,124 @@
 
     <h2>Cadastro de Usuário</h2>
 
+    <!--
+        novalidate desativa temporariamente a validação do navegador,
+        permitindo testar as mensagens geradas pelo Spring Boot.
+    -->
     <form th:action="@{/usuarios/salvar}"
           th:object="${usuario}"
-          method="post">
+          method="post"
+          novalidate>
 
-        <label for="nome">Nome</label>
+        <div class="alerta-erro"
+             th:if="${#fields.hasAnyErrors()}">
+
+            Existem informações inválidas. Verifique os campos abaixo.
+
+        </div>
+
+        <!-- Nome -->
+
+        <label for="nome">
+            Nome
+        </label>
 
         <input id="nome"
                type="text"
                th:field="*{nome}"
+               th:errorclass="campo-invalido"
                maxlength="100"
-               autocomplete="name"
-               required>
+               autocomplete="name">
 
-        <label for="email">E-mail</label>
+        <span class="mensagem-erro"
+              th:if="${#fields.hasErrors('nome')}"
+              th:errors="*{nome}">
+            Erro no nome
+        </span>
+
+        <!-- E-mail -->
+
+        <label for="email">
+            E-mail
+        </label>
 
         <input id="email"
                type="email"
                th:field="*{email}"
+               th:errorclass="campo-invalido"
                maxlength="100"
-               autocomplete="email"
-               required>
+               autocomplete="email">
 
-        <label for="senha">Senha</label>
+        <span class="mensagem-erro"
+              th:if="${#fields.hasErrors('email')}"
+              th:errors="*{email}">
+            Erro no e-mail
+        </span>
+
+        <!-- Senha -->
+
+        <label for="senha">
+            Senha
+        </label>
 
         <input id="senha"
                type="password"
                th:field="*{senha}"
-               minlength="6"
-               autocomplete="new-password"
-               required>
+               th:errorclass="campo-invalido"
+               maxlength="100"
+               autocomplete="new-password">
 
-        <label for="perfil">Perfil</label>
+        <!-- Mostra apenas esta mensagem quando a senha estiver vazia -->
+
+        <span class="mensagem-erro"
+              th:if="${#fields.hasErrors('senha')
+                       and #strings.isEmpty(usuario.senha)}">
+
+            A senha é obrigatória
+
+        </span>
+
+        <!-- Mostra a mensagem de tamanho quando existe algum valor -->
+
+        <span class="mensagem-erro"
+              th:if="${#fields.hasErrors('senha')
+                       and !#strings.isEmpty(usuario.senha)}">
+
+            A senha deve possuir entre 6 e 100 caracteres
+
+        </span>
+
+        <!-- Perfil -->
+
+        <label for="perfil">
+            Perfil
+        </label>
 
         <select id="perfil"
                 th:field="*{perfil}"
-                required>
+                th:errorclass="campo-invalido">
 
-            <option value="">Selecione um perfil</option>
-            <option value="ADMIN">Administrador</option>
-            <option value="TECNICO">Técnico</option>
+            <option value="">
+                Selecione um perfil
+            </option>
+
+            <option value="ADMIN">
+                Administrador
+            </option>
+
+            <option value="TECNICO">
+                Técnico
+            </option>
 
         </select>
+
+        <span class="mensagem-erro"
+              th:if="${#fields.hasErrors('perfil')}"
+              th:errors="*{perfil}">
+            Erro no perfil
+        </span>
+
+        <!-- Situação do usuário -->
 
         <div class="checkbox-container">
 
@@ -161,9 +278,13 @@
                    type="checkbox"
                    th:field="*{ativo}">
 
-            <label for="ativo">Usuário ativo</label>
+            <label for="ativo">
+                Usuário ativo
+            </label>
 
         </div>
+
+        <!-- Botões -->
 
         <div class="acoes">
 

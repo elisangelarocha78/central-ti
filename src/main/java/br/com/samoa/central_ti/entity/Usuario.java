@@ -1,7 +1,19 @@
 package br.com.samoa.central_ti.entity;
 
 import br.com.samoa.central_ti.enums.PerfilUsuario;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
@@ -13,19 +25,38 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "O nome é obrigatório")
+    @Size(
+            max = 100,
+            message = "O nome deve possuir no máximo 100 caracteres"
+    )
     @Column(nullable = false, length = 100)
     private String nome;
 
+    @NotBlank(message = "O e-mail é obrigatório")
+    @Email(message = "Informe um e-mail válido")
+    @Size(
+            max = 100,
+            message = "O e-mail deve possuir no máximo 100 caracteres"
+    )
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
+    @NotBlank(message = "A senha é obrigatória")
+    @Size(
+            min = 6,
+            max = 100,
+            message = "A senha deve possuir entre 6 e 100 caracteres"
+    )
     @Column(nullable = false)
     private String senha;
 
     /*
-     * A propriedade Java passa a se chamar perfil,
-     * mas continuará usando a coluna "status" já existente no banco.
+     * A propriedade Java se chama perfil,
+     * mas continua utilizando a coluna "status"
+     * existente no banco de dados.
      */
+    @NotNull(message = "Selecione um perfil")
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private PerfilUsuario perfil;
@@ -40,6 +71,9 @@ public class Usuario {
     )
     private LocalDateTime dataCadastro;
 
+    public Usuario() {
+    }
+
     @PrePersist
     protected void onCreate() {
 
@@ -50,9 +84,6 @@ public class Usuario {
         if (ativo == null) {
             ativo = true;
         }
-    }
-
-    public Usuario() {
     }
 
     public Long getId() {
@@ -105,9 +136,5 @@ public class Usuario {
 
     public LocalDateTime getDataCadastro() {
         return dataCadastro;
-    }
-
-    public void setDataCadastro(LocalDateTime dataCadastro) {
-        this.dataCadastro = dataCadastro;
     }
 }
