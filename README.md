@@ -59,9 +59,9 @@ O **Central TI** pretende organizar esse processo, permitindo que:
 
 ---
 
-## ✅ Funcionalidades concluídas
+# ✅ Funcionalidades concluídas
 
-### 👥 Usuários
+## 👥 Usuários
 
 * ✅ Estrutura inicial do projeto Spring Boot
 * ✅ Configuração da conexão com o SQL Server
@@ -71,41 +71,86 @@ O **Central TI** pretende organizar esse processo, permitindo que:
 * ✅ Criação do `UsuarioController`
 * ✅ Cadastro de usuários
 * ✅ Listagem de usuários
-* ✅ Campo para ativar ou desativar usuários
 * ✅ Tela de cadastro de usuários
 * ✅ Tela de listagem de usuários
+* ✅ Campo ativo/inativo
 * ✅ Exibição amigável dos perfis
 * ✅ Exibição da situação ativa ou inativa do usuário
+* ✅ Edição de usuários
+* ✅ Botão de edição na listagem
+* ✅ Formulário específico para edição
+* ✅ Preservação do ID durante a edição
+* ✅ Preservação da data original de cadastro
 
-### 👤 Perfis
+---
 
-Perfis controlados por enum:
+## 👤 Perfis de usuário
+
+Os perfis são controlados através do enum `PerfilUsuario`.
+
+Perfis disponíveis:
 
 * 👑 `ADMIN`
 * 🧑‍💻 `TECNICO`
 
-### 🔍 Validações
+O banco continua utilizando a coluna:
+
+```text
+status
+```
+
+Enquanto no Java ela é representada por:
+
+```java
+PerfilUsuario perfil
+```
+
+---
+
+## 🔍 Validações
+
+O cadastro possui validações no backend utilizando **Jakarta Validation**.
+
+Atualmente estão implementadas:
 
 * ✅ Nome obrigatório
 * ✅ Limite de tamanho do nome
 * ✅ E-mail obrigatório
 * ✅ Validação do formato do e-mail
 * ✅ Limite de tamanho do e-mail
-* ✅ Senha obrigatória
+* ✅ Senha obrigatória no cadastro
 * ✅ Senha com no mínimo 6 caracteres
 * ✅ Perfil obrigatório
 * ✅ Exibição de mensagens de erro no formulário
 * ✅ Destaque visual dos campos inválidos
 * ✅ Bloqueio do salvamento quando existem dados inválidos
 
-### 📧 Controle de e-mails
+Exemplo:
 
-* ✅ Bloqueio de e-mails duplicados
+```text
+Nome:
+[vazio]
+
+Resultado:
+O nome é obrigatório
+```
+
+---
+
+## 📧 Controle de e-mails
+
+O sistema possui proteção contra duplicidade de e-mails.
+
+Funcionalidades implementadas:
+
 * ✅ Verificação de e-mail já cadastrado
-* ✅ Normalização dos e-mails antes do cadastro
-* ✅ Conversão automática do e-mail para letras minúsculas
+* ✅ Bloqueio de e-mails duplicados
+* ✅ Normalização dos e-mails
+* ✅ Conversão automática para letras minúsculas
 * ✅ Remoção de espaços extras com `trim()`
 * ✅ Mensagem amigável para e-mail já cadastrado
+* ✅ Bloqueio de duplicidade durante a edição
+* ✅ Permite manter o próprio e-mail durante a edição
 
 Exemplo:
 
@@ -115,33 +160,125 @@ ADMIN@CENTRALTI.COM
 admin@centralti.com
 ```
 
-### 🔐 Segurança das senhas
+Caso o e-mail pertença a outro usuário:
+
+```text
+Já existe outro usuário cadastrado com este e-mail
+```
+
+---
+
+## 🔐 Segurança das senhas
+
+As senhas são protegidas utilizando **BCrypt**.
+
+Funcionalidades concluídas:
 
 * ✅ Integração com `spring-security-crypto`
-* ✅ Configuração do `BCryptPasswordEncoder`
-* ✅ Criptografia da senha antes do armazenamento
+* ✅ Configuração de `PasswordEncoder`
+* ✅ Uso do `BCryptPasswordEncoder`
+* ✅ Criptografia da senha antes de salvar
 * ✅ Senhas não são mais armazenadas em texto puro
+* ✅ Nova senha é criptografada durante a edição
+* ✅ Senha atual é preservada quando o campo de nova senha fica vazio
+* ✅ Hash BCrypt não é enviado para o formulário de edição
+* ✅ Evita criptografar novamente uma senha já criptografada
 
 Exemplo:
 
 ```text
 Senha informada:
+
 123456
 
-        ↓ BCrypt
+        ↓
 
-Senha armazenada:
+BCrypt
+
+        ↓
+
 $2a$10$...
 ```
 
+O BCrypt utiliza salt automaticamente, portanto duas senhas iguais podem gerar hashes diferentes.
+
 ---
 
-## 🚧 Funcionalidades em desenvolvimento
+# ✏️ Edição de usuários
 
-* ✏️ Edição de usuários
+A edição de usuários está funcionando.
+
+A tela permite alterar:
+
+* ✅ Nome
+* ✅ E-mail
+* ✅ Perfil
+* ✅ Situação ativo/inativo
+* ✅ Senha opcional
+
+A edição utiliza:
+
+```text
+UsuarioEdicaoDTO
+```
+
+Isso permite separar as regras do cadastro das regras de edição.
+
+---
+
+## 🔐 Alteração de senha durante a edição
+
+No formulário de edição existe o campo:
+
+```text
+Nova senha
+```
+
+Se ele for deixado vazio:
+
+```text
+Nova senha: [vazio]
+        ↓
+Senha atual é preservada
+```
+
+Se uma nova senha for informada:
+
+```text
+Nova senha: 654321
+        ↓
+BCrypt
+        ↓
+Novo hash é armazenado
+```
+
+O sistema nunca exibe o hash atual no formulário.
+
+---
+
+## 🧪 Testes realizados na edição
+
+Foram testados com sucesso:
+
+* ✅ Alteração do nome
+* ✅ Alteração do perfil
+* ✅ Alteração do status ativo/inativo
+* ✅ Manutenção da senha atual
+* ✅ Alteração para uma nova senha
+* ✅ Geração de novo hash BCrypt
+* ✅ Preservação do hash quando a senha não é alterada
+* ✅ Bloqueio de e-mail pertencente a outro usuário
+* ✅ Preservação do e-mail original quando ocorre erro
+* ✅ Preservação do mesmo ID do usuário
+
+---
+
+# 🚧 Funcionalidades em desenvolvimento
+
 * 🗑️ Exclusão de usuários
 * 🔄 Melhorias na ativação e desativação de usuários
 * 📢 Mensagens de sucesso
+* 🧪 Testes automatizados
 * 🔑 Login
 * 🔒 Controle de acesso
 * 🎧 Módulo de atendimento
@@ -149,49 +286,71 @@ $2a$10$...
 
 ---
 
-## 🗺️ Próximas etapas
+# 🗺️ Próximas etapas
 
-### 👥 Módulo de usuários
+## 👥 Módulo de usuários
 
-Próxima etapa imediata:
+### ⏭️ Próxima etapa imediata
 
-* ✏️ Implementar edição de usuários
+**Etapa 1.6 — desativação e exclusão de usuários**
 
-Depois:
+Planejado:
 
-* 🔐 Permitir alteração segura de senha
-* 🗑️ Implementar exclusão de usuários
-* 🔄 Melhorar ativação e desativação
+* 🗑️ Implementar exclusão de usuário
+* ⚠️ Adicionar confirmação antes da exclusão
+* 🔄 Melhorar controle ativo/inativo
+* 🛡️ Evitar exclusão indevida de usuários importantes
 * 📢 Adicionar mensagens de sucesso
-* 🧪 Criar testes para o módulo de usuários
+* 🧪 Criar testes do módulo
+
+Como futuramente os usuários estarão relacionados aos atendimentos, a preferência será por **desativar usuários em vez de excluí-los fisicamente** quando já existirem registros vinculados.
 
 ---
 
-### 🔒 Segurança
+# 🔒 Segurança
 
-Após concluir o módulo de usuários:
+Depois de concluir o módulo de usuários:
 
 * 🔑 Implementar login com Spring Security
 * 👤 Identificar o usuário autenticado
-* 🛡️ Separar permissões de administrador e técnico
-* ⛔ Impedir o acesso de usuários inativos
-* 🔐 Proteger as páginas do sistema
+* 🛡️ Separar permissões entre `ADMIN` e `TECNICO`
+* ⛔ Impedir login de usuários inativos
+* 🔐 Proteger páginas administrativas
 * 🚪 Implementar logout
+* 🔄 Gerenciar sessão
+
+Fluxo planejado:
+
+```text
+Usuário informa e-mail e senha
+            ↓
+Spring Security
+            ↓
+Busca usuário no SQL Server
+            ↓
+BCrypt compara a senha
+            ↓
+Usuário autenticado
+```
 
 ---
 
-### 🎧 Atendimento
+# 🎧 Atendimento
 
-* 👥 Criar cadastro de contatos
-* 📋 Criar entidade de atendimento
-* 💬 Criar entidade de mensagens
-* 📥 Criar fila de novos atendimentos
-* 🙋 Permitir que um técnico assuma um atendimento
-* 🧑‍💻 Registrar o técnico responsável
-* 🕐 Registrar data e horário de início
-* 🕓 Registrar data e horário de finalização
-* ✅ Permitir finalizar atendimento
-* 📚 Armazenar o histórico dos atendimentos
+Depois da autenticação será criado o módulo de atendimento.
+
+Funcionalidades planejadas:
+
+* 👥 Cadastro de contatos
+* 📋 Entidade de atendimento
+* 💬 Entidade de mensagens
+* 📥 Fila de novos atendimentos
+* 🙋 Técnico assume atendimento
+* 🧑‍💻 Registro do técnico responsável
+* 🕐 Registro da data e hora de início
+* 🕓 Registro da data e hora de finalização
+* ✅ Finalização do atendimento
+* 📚 Histórico de atendimentos
 
 Fluxo inicial:
 
@@ -211,68 +370,103 @@ Histórico
 
 ---
 
-### 📱 WhatsApp
+# 📱 Integração com WhatsApp
 
-A automação será desenvolvida no próprio **Spring Boot**.
+A automação será desenvolvida dentro do próprio **Spring Boot**.
+
+A API do WhatsApp será responsável apenas pela comunicação entre o WhatsApp e o Central TI.
 
 Etapas previstas:
 
 * 🔌 Configurar integração com a API do WhatsApp
-* 🌐 Criar webhook para recebimento de mensagens
+* 🌐 Criar webhook
 * 📥 Receber mensagens no Spring Boot
 * 📤 Enviar mensagens pelo Spring Boot
-* 🤖 Criar atendimentos automaticamente
+* 🤖 Criar atendimento automaticamente
+* 📥 Adicionar novo atendimento à fila
+* 🙋 Permitir que um técnico assuma a conversa
 * 👋 Enviar automaticamente a apresentação do técnico
-* 🖥️ Permitir respostas pelo painel do Central TI
-* 💾 Registrar mensagens enviadas e recebidas
+* 🖥️ Permitir respostas através do painel
+* 💾 Registrar mensagens enviadas
+* 💾 Registrar mensagens recebidas
 * 🔗 Relacionar cada conversa ao técnico responsável
-* ✅ Finalizar atendimentos pelo painel
+* ✅ Finalizar atendimento pelo painel
 
-Exemplo de apresentação automática:
+Exemplo:
 
 ```text
+Cliente:
+Olá, preciso de ajuda com meu computador.
+
+        ↓
+
+Central TI cria atendimento
+
+        ↓
+
+Técnico assume
+
+        ↓
+
+Sistema envia:
+
 Olá! Meu nome é Elisangela e ficarei responsável pelo seu atendimento.
 Como posso ajudar?
 ```
 
 ---
 
-### 🌍 Produção
+# 🌍 Produção
 
 Quando o sistema estiver funcional:
 
-* 🖥️ Preparar ambiente de produção
+* 🖥️ Preparar servidor de produção
 * 🔒 Configurar HTTPS
 * 🛢️ Configurar banco de dados de produção
-* 🔑 Proteger credenciais e tokens
+* 🔑 Proteger credenciais
+* 🔑 Proteger tokens da API
 * 💾 Implementar backup
 * 📝 Configurar logs
 * 📊 Configurar monitoramento
-* 📱 Conectar o número oficial de atendimento
+* 📱 Conectar o número oficial do WhatsApp
 
 ---
 
-## 🔗 Endereços disponíveis atualmente
+# 🔗 Endereços disponíveis atualmente
 
-### Listagem de usuários
+## 👥 Listagem de usuários
 
 ```text
 http://localhost:8080/usuarios
 ```
 
-### Cadastro de usuário
+## ➕ Cadastro de usuário
 
 ```text
 http://localhost:8080/usuarios/novo
 ```
 
+## ✏️ Edição de usuário
+
+```text
+http://localhost:8080/usuarios/editar/{id}
+```
+
+Exemplo:
+
+```text
+http://localhost:8080/usuarios/editar/15
+```
+
 ---
 
-## 🗄️ Banco de dados
+# 🗄️ Banco de dados
 
-O projeto utiliza **SQL Server 2022**.
+O projeto utiliza:
 
-A configuração local fica em:
+**SQL Server 2022**
+
+Configuração local:
 
 ```text
 src/main/resources/application-local.properties
@@ -280,7 +474,7 @@ src/main/resources/application-local.properties
 
 > ⚠️ Credenciais, senhas, tokens e outras informações sensíveis não devem ser enviadas ao repositório público.
 
-A tabela utilizada atualmente é:
+Tabela atualmente utilizada:
 
 ```text
 usuarios
@@ -298,48 +492,38 @@ ativo
 data_cadastro
 ```
 
-O campo `status` no banco é representado no Java pela propriedade:
-
-```java
-PerfilUsuario perfil
-```
-
-com os valores:
-
-```text
-ADMIN
-TECNICO
-```
-
 ---
 
-## 🔐 Senhas
+# 🔐 Senhas no banco
 
-As senhas de novos usuários são processadas pelo **BCrypt** antes de serem salvas.
-
-O sistema não armazena a senha original no banco.
+Novos usuários possuem senhas armazenadas como hash BCrypt.
 
 Exemplo:
 
 ```text
+Senha:
+
 123456
 ```
 
-é transformado em um hash semelhante a:
+No banco:
 
 ```text
-$2a$10$Sr...
+$2a$10$...
 ```
 
-O hash BCrypt não é descriptografado.
+O hash BCrypt:
 
-No futuro, durante o login, o sistema verificará se a senha informada corresponde ao hash armazenado.
+* não é descriptografado;
+* não revela a senha original;
+* utiliza salt automaticamente;
+* será utilizado futuramente pelo Spring Security para autenticação.
 
 ---
 
-## ▶️ Executando o projeto
+# ▶️ Executando o projeto
 
-### 📋 Requisitos
+## 📋 Requisitos
 
 * ☕ Java 21
 * 🛢️ SQL Server 2022
@@ -347,32 +531,22 @@ No futuro, durante o login, o sistema verificará se a senha informada correspon
 * 💻 IntelliJ IDEA ou outra IDE compatível
 * 🌿 Git
 
-### 💻 Pelo IntelliJ IDEA
+---
 
-Execute a classe:
+## 💻 Pelo IntelliJ IDEA
+
+Execute:
 
 ```text
 CentralTiApplication
 ```
 
-> ⚠️ Não execute `CentralTiApplicationTests` quando quiser acessar o sistema pelo navegador.
+> ⚠️ Não execute `CentralTiApplicationTests` quando quiser utilizar o sistema pelo navegador.
 
-Quando a aplicação estiver iniciada corretamente, o console deverá indicar que o Tomcat está ativo na porta `8080`.
+Quando iniciado corretamente, o console deverá indicar que o Tomcat está ativo na porta:
 
----
-
-### ⌨️ Pelo terminal
-
-No Linux ou macOS:
-
-```bash
-./mvnw spring-boot:run
-```
-
-No Windows PowerShell:
-
-```powershell
-.\mvnw.cmd spring-boot:run
+```text
+8080
 ```
 
 Depois acesse:
@@ -383,7 +557,23 @@ http://localhost:8080/usuarios
 
 ---
 
-## 📁 Estrutura principal do projeto
+## ⌨️ Pelo terminal
+
+Linux ou macOS:
+
+```bash
+./mvnw spring-boot:run
+```
+
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
+---
+
+# 📁 Estrutura principal do projeto
 
 ```text
 src
@@ -393,14 +583,34 @@ src
     │       └── com
     │           └── samoa
     │               └── central_ti
+    │
     │                   ├── config
     │                   │   └── SecurityConfig.java
+    │                   │
     │                   ├── controller
+    │                   │   ├── DashboardController.java
+    │                   │   ├── LoginController.java
+    │                   │   └── UsuarioController.java
+    │                   │
     │                   ├── dto
+    │                   │   ├── LoginDTO.java
+    │                   │   └── UsuarioEdicaoDTO.java
+    │                   │
     │                   ├── entity
+    │                   │   ├── StatusAtendimento.java
+    │                   │   └── Usuario.java
+    │                   │
     │                   ├── enums
+    │                   │   ├── PerfilUsuario.java
+    │                   │   └── StatusTecnico.java
+    │                   │
     │                   ├── repository
+    │                   │   ├── StatusAtendimentoRepository.java
+    │                   │   └── UsuarioRepository.java
+    │                   │
     │                   ├── service
+    │                   │   └── UsuarioService.java
+    │                   │
     │                   └── CentralTiApplication.java
     │
     └── resources
@@ -409,25 +619,32 @@ src
         │   ├── fragments
         │   ├── login
         │   └── usuario
+        │       ├── editar.html
+        │       ├── listar.html
+        │       └── novo.html
+        │
         ├── application.properties
         └── application-local.properties
 ```
 
 ---
 
-## 👤 Perfis de usuário
+# 👤 Perfis de usuário
 
-### 👑 Administrador
+## 👑 Administrador
 
 O perfil `ADMIN` será responsável por:
 
 * 👤 cadastrar usuários;
 * ✏️ editar usuários;
 * 🗑️ excluir ou desativar usuários;
+* 🔄 ativar usuários;
 * ⚙️ acessar configurações administrativas;
 * 📊 acompanhar atendimentos.
 
-### 🧑‍💻 Técnico
+---
+
+## 🧑‍💻 Técnico
 
 O perfil `TECNICO` será responsável por:
 
@@ -440,7 +657,7 @@ O perfil `TECNICO` será responsável por:
 
 ---
 
-## 📌 Status do projeto
+# 📌 Status do projeto
 
 🚧 **Projeto em desenvolvimento e utilizado inicialmente para estudo.**
 
@@ -455,28 +672,59 @@ Atualmente estão funcionando:
 ✅ Bloqueio de e-mails duplicados
 ✅ Normalização dos e-mails
 ✅ Criptografia das senhas com BCrypt
+✅ Edição de usuários
+✅ Alteração de nome
+✅ Alteração de e-mail
+✅ Alteração de perfil
+✅ Ativação/desativação pela edição
+✅ Alteração segura de senha
+✅ Preservação da senha quando não alterada
 ```
-
-### ⏭️ Próxima etapa
-
-**Etapa 1.5 — Implementar edição de usuários.**
-
-A edição deverá permitir alterar:
-
-* nome;
-* e-mail;
-* perfil;
-* situação ativo/inativo;
-* senha, somente quando uma nova senha for informada.
-
-Também será necessário garantir que uma senha já criptografada **não seja criptografada novamente** quando o usuário for editado sem alterar a senha.
 
 ---
 
-## ℹ️ Observação
+## ⏭️ Próxima etapa
+
+**Etapa 1.6 — desativação e exclusão de usuários.**
+
+Nesta etapa serão implementados:
+
+* controle mais claro de ativação e desativação;
+* botão de exclusão;
+* confirmação antes da exclusão;
+* proteção contra exclusões indevidas;
+* preparação para manter histórico de usuários ligados aos atendimentos.
+
+Depois disso, o próximo grande módulo será:
+
+```text
+🔑 Login
+        ↓
+🔒 Spring Security
+        ↓
+👤 Identificação do técnico
+        ↓
+🎧 Atendimento
+        ↓
+📱 WhatsApp
+```
+
+---
+
+# ℹ️ Observação
 
 A automação será desenvolvida no próprio **Spring Boot**.
 
 A API do WhatsApp será utilizada como meio de comunicação para receber e enviar mensagens.
 
-A lógica de criação da fila, identificação do técnico, abertura do atendimento, envio da apresentação, registro das mensagens e finalização será controlada pela aplicação **Central TI**.
+A lógica de:
+
+* criação da fila;
+* identificação do técnico;
+* abertura do atendimento;
+* envio da apresentação;
+* registro das mensagens;
+* controle do responsável;
+* finalização do atendimento;
+
+será controlada pela aplicação **Central TI**.

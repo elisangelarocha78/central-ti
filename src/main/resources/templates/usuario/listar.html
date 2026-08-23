@@ -24,7 +24,7 @@
 
         .container {
             width: 100%;
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 30px;
             background-color: #ffffff;
@@ -92,6 +92,26 @@
             font-weight: bold;
         }
 
+        .acoes {
+            white-space: nowrap;
+        }
+
+        .botao-editar {
+            display: inline-block;
+            padding: 7px 14px;
+            border: 1px solid #2c3e50;
+            border-radius: 4px;
+            background-color: #ffffff;
+            color: #2c3e50;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .botao-editar:hover {
+            background-color: #2c3e50;
+            color: #ffffff;
+        }
+
         .sem-registros {
             padding: 25px;
             color: #666666;
@@ -141,6 +161,7 @@
                 <th>E-mail</th>
                 <th>Perfil</th>
                 <th>Ativo</th>
+                <th>Ações</th>
             </tr>
             </thead>
 
@@ -173,11 +194,20 @@
                     Sim
                 </td>
 
+                <td class="acoes">
+
+                    <a class="botao-editar"
+                       th:href="@{/usuarios/editar/{id}(id=${usuario.id})}">
+                        Editar
+                    </a>
+
+                </td>
+
             </tr>
 
             <tr th:if="${#lists.isEmpty(usuarios)}">
 
-                <td colspan="5"
+                <td colspan="6"
                     class="sem-registros">
                     Nenhum usuário cadastrado.
                 </td>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width,
+                   initial-scale=1.0">
+
+    <title>Editar Usuário</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px;
+            font-family: Arial, sans-serif;
+            background-color: #f5f6f8;
+            color: #222;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 460px;
+            margin: 0 auto;
+            padding: 28px;
+            background-color: white;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+
+        label {
+            display: block;
+            margin-top: 14px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select {
+
+            width: 100%;
+            padding: 10px;
+
+            border: 1px solid #b8b8b8;
+            border-radius: 4px;
+
+            font-size: 15px;
+        }
+
+        .campo-invalido {
+            border-color: #e74c3c !important;
+            background-color: #fff7f6;
+        }
+
+        .mensagem-erro {
+
+            display: block;
+
+            margin-top: 5px;
+
+            color: #d93025;
+
+            font-size: 14px;
+        }
+
+        .alerta-erro {
+
+            margin-bottom: 18px;
+
+            padding: 12px;
+
+            border: 1px solid #e8a39d;
+            border-radius: 4px;
+
+            background-color: #fff1f0;
+
+            color: #a93226;
+        }
+
+        .ajuda {
+
+            display: block;
+
+            margin-top: 5px;
+
+            color: #666;
+
+            font-size: 13px;
+        }
+
+        .checkbox-container {
+
+            display: flex;
+            align-items: center;
+
+            margin-top: 22px;
+            margin-bottom: 22px;
+        }
+
+        .checkbox-container input {
+
+            margin-right: 8px;
+        }
+
+        .checkbox-container label {
+
+            margin: 0;
+            font-weight: normal;
+        }
+
+        .acoes {
+
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+
+            padding: 10px 22px;
+
+            border: none;
+            border-radius: 4px;
+
+            background-color: #2c3e50;
+
+            color: white;
+
+            cursor: pointer;
+        }
+
+        .cancelar {
+
+            padding: 9px 18px;
+
+            border: 1px solid #777;
+
+            border-radius: 4px;
+
+            color: #333;
+
+            text-decoration: none;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Editar Usuário</h2>
+
+    <form
+            th:action="@{/usuarios/editar/{id}
+            (id=${usuarioEdicao.id})}"
+
+            th:object="${usuarioEdicao}"
+
+            method="post"
+
+            novalidate>
+
+        <div
+                class="alerta-erro"
+
+                th:if="${#fields.hasAnyErrors()}">
+
+            Existem informações inválidas.
+            Verifique os campos abaixo.
+
+        </div>
+
+        <!-- ID -->
+
+        <input
+                type="hidden"
+                th:field="*{id}">
+
+        <!-- Nome -->
+
+        <label for="nome">
+            Nome
+        </label>
+
+        <input
+                id="nome"
+                type="text"
+                th:field="*{nome}"
+                th:errorclass="campo-invalido">
+
+        <span
+                class="mensagem-erro"
+
+                th:if="${#fields.hasErrors('nome')}"
+
+                th:errors="*{nome}">
+        </span>
+
+        <!-- E-mail -->
+
+        <label for="email">
+            E-mail
+        </label>
+
+        <input
+                id="email"
+                type="email"
+                th:field="*{email}"
+                th:errorclass="campo-invalido">
+
+        <span
+                class="mensagem-erro"
+
+                th:if="${#fields.hasErrors('email')}"
+
+                th:errors="*{email}">
+        </span>
+
+        <!-- Nova senha -->
+
+        <label for="senha">
+            Nova senha
+        </label>
+
+        <input
+                id="senha"
+                type="password"
+                th:field="*{senha}"
+                th:errorclass="campo-invalido"
+                autocomplete="new-password">
+
+        <span class="ajuda">
+            Deixe em branco para manter a senha atual.
+        </span>
+
+        <span
+                class="mensagem-erro"
+
+                th:if="${#fields.hasErrors('senha')}"
+
+                th:errors="*{senha}">
+        </span>
+
+        <!-- Perfil -->
+
+        <label for="perfil">
+            Perfil
+        </label>
+
+        <select
+                id="perfil"
+                th:field="*{perfil}"
+                th:errorclass="campo-invalido">
+
+            <option value="">
+                Selecione um perfil
+            </option>
+
+            <option value="ADMIN">
+                Administrador
+            </option>
+
+            <option value="TECNICO">
+                Técnico
+            </option>
+
+        </select>
+
+        <span
+                class="mensagem-erro"
+
+                th:if="${#fields.hasErrors('perfil')}"
+
+                th:errors="*{perfil}">
+        </span>
+
+        <!-- Ativo -->
+
+        <div class="checkbox-container">
+
+            <input
+                    id="ativo"
+                    type="checkbox"
+                    th:field="*{ativo}">
+
+            <label for="ativo">
+                Usuário ativo
+            </label>
+
+        </div>
+
+        <!-- Ações -->
+
+        <div class="acoes">
+
+            <button type="submit">
+                Salvar alterações
+            </button>
+
+            <a
+                    class="cancelar"
+                    th:href="@{/usuarios}">
+                Cancelar
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+</body>
+
+</html>
